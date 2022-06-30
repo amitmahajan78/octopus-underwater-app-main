@@ -5,43 +5,30 @@ on:
   push:
     branches: 
       - main
-
-env:
-  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
-  GKE_CLUSTER: demo-cluster    # TODO: update to cluster name
-  GKE_REGION: europe-west2   # TODO: update to cluster region
-
+      
 jobs:
-  build-image-deploy-on-kube:
+  docker:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v1
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v2
         with:
-          java-version: 11
-      
-      # creating artefact and building docker image
-      - run: mvn clean install && docker build -t amitmahajan/demo-api .
-      - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-      # docker imgae pushed into dockerhub repo
-      - run: docker push amitmahajan/demo-api
-      
-      # Setup gcloud CLI
-      - uses: google-github-actions/setup-gcloud@master
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v3
         with:
-          version: '290.0.1'
-          service_account_key: ${{ secrets.GKE_SA_KEY }}
-          project_id: ${{ secrets.GKE_PROJECT }}
-      
-      # Get the GKE credentials so we can deploy to the cluster
-      - run: |-
-          gcloud container clusters get-credentials "$GKE_CLUSTER" --region "$GKE_REGION"
-      
-      # Deploy the demo-api to the GKE cluster
-      - name: Deploy
-        run: |-
-          kubectl rollout restart deployment demo-app-depl
-          kubectl rollout status deployment demo-app-depl   
+          context: .
+          push: true
+          tags: amitmahajan/underwater-app
