@@ -1,0 +1,5 @@
+services:
+  web-app:
+    image: amitmahajan/docker-demo
+    ports:
+      - 8086-8089:80
