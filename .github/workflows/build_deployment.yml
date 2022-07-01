@@ -7,7 +7,7 @@ on:
       - main
 
 env:
-  EKS_CLUSTER_NAME: education-eks-7TsYDktb
+  EKS_CLUSTER_NAME: education-eks-SK95M4o1
   
 jobs:
   docker:
