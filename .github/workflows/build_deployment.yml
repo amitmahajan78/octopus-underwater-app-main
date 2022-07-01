@@ -5,7 +5,9 @@ on:
   push:
     branches: 
       - main
-      
+
+env:
+  EKS_CLUSTER_NAME: education-eks-7TsYDktb
 jobs:
   docker:
     runs-on: ubuntu-latest
@@ -32,3 +34,19 @@ jobs:
           context: .
           push: true
           tags: amitmahajan/underwater-app
+      -
+        name: Configure AWS credintials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: us-east-2
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secret.AWS_SESSION_TOKEN }}
+      - name: Configure kubectl
+        run: 
+          aws eks --region us-east-2 update-kubeconfig --name ${{EKS_CLUSTER_NAME}}
+          kubectl get nodes
+          
+          
+          
+  
