@@ -46,6 +46,8 @@ jobs:
       - name: Configure kubectl
         run: 
           aws eks --region us-east-2 update-kubeconfig --name $EKS_CLUSTER_NAME
+      - name: Kubectl run  
+        run:
           kubectl get nodes
           
           
