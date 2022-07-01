@@ -49,7 +49,9 @@ jobs:
       - name: Kubectl run  
         run:
           kubectl get nodes
-          
+      - name: Deploy nginx app
+        run: 
+          kubectl rollout restart deployment nginx-deployment
           
           
   
